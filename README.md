@@ -26,3 +26,6 @@ npm run lint
 ```
 
 ### Deployment
+```
+make deploy
+```
