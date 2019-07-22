@@ -64,7 +64,7 @@ export default {
     },
     loadVINs: function() {
       fetchVINs(this.baseURL, this.apiVersion, this.market).then(json => {
-        this.models = json.models;
+        this.vins = json;
       });
     },
     loadModels: function() {
@@ -89,7 +89,7 @@ async function fetchVINs(url, apiVersion, market) {
   if (apiVersion === "v2") {
     response = await fetch("https://" + url + "/api/" + apiVersion + "/models");
   } else {
-    response = await fetch( "https://" + url + "/api/" + apiVersion + "/" + market + "/models" );
+    response = await fetch( "https://" + url + "/api/" + apiVersion + "/models/" + market);
   }
   let data = await response.json();
   return data;
