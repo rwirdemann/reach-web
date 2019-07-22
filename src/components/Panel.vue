@@ -2,14 +2,14 @@
   <form>
     <div class="form-group row">
       <label class="col-sm-9 col-form-label">API Version</label>
-      <select class="form-control col-sm-3">
+      <select class="form-control col-sm-3" v-model="apiVersion" v-on:change="toggleMarketSelection(); loadVINs()">
         <option>v2</option>
         <option>v3</option>
       </select>
     </div>
     <div class="form-group row">
       <label class="col-sm-9 col-form-label">Market</label>
-      <select class="form-control col-sm-3">
+      <select class="form-control col-sm-3" v-model="market" :disabled="isMarketSelectable != 1" v-on:change="loadVINs()">
         <option>v</option>
         <option>n</option>
       </select>
@@ -47,15 +47,26 @@ export default {
       selectedVin: "",
       vins: [],
       selectedModel: "",
-      models: []
+      models: [],
+      market: "v",
+      isMarketSelectable: false,
+      apiVersion: "v2"
     };
   },
   created() {
-    fetchAllModels(this.baseURL).then(json => {
+    fetchVINs(this.baseURL, this.apiVersion, this.market).then(json => {
       this.vins = json;
     });
   },
   methods: {
+    toggleMarketSelection: function() {
+      this.isMarketSelectable = this.apiVersion == "v3";
+    },
+    loadVINs: function() {
+      fetchVINs(this.baseURL, this.apiVersion, this.market).then(json => {
+        this.models = json.models;
+      });
+    },
     loadModels: function() {
       let m = this.selectedVin.trim().split(" ");
       let vinClass = m[m.length - 2].trim();
@@ -73,8 +84,13 @@ export default {
   }
 };
 
-async function fetchAllModels(url) {
-  let response = await fetch("https://" + url + "/api/v2/models");
+async function fetchVINs(url, apiVersion, market) {
+  var response;
+  if (apiVersion === "v2") {
+    response = await fetch("https://" + url + "/api/" + apiVersion + "/models");
+  } else {
+    response = await fetch( "https://" + url + "/api/" + apiVersion + "/" + market + "/models" );
+  }
   let data = await response.json();
   return data;
 }
