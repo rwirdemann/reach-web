@@ -71,7 +71,7 @@ export default {
       let m = this.selectedVin.trim().split(" ");
       let vinClass = m[m.length - 2].trim();
       let vinYear = m[m.length - 1].trim();
-      fetchModels(this.baseURL, vinClass, vinYear).then(json => {
+      fetchModels(this.baseURL, this.apiVersion, this.market, vinClass, vinYear).then(json => {
         this.models = json.models;
       });
     },
@@ -95,10 +95,13 @@ async function fetchVINs(url, apiVersion, market) {
   return data;
 }
 
-async function fetchModels(url, vinClass, vinYear) {
-  let response = await fetch(
-    "https://" + url + "/api/v2/models/" + vinClass + "/" + vinYear
-  );
+async function fetchModels(url, apiVersion, market, vinClass, vinYear) {
+  var response;
+  if (apiVersion === "v2") {
+    response = await fetch("https://" + url + "/api/" + apiVersion + "/models/" + vinClass + "/" + vinYear);
+  } else {
+    response = await fetch( "https://" + url + "/api/" + apiVersion + "/models/" + market + "/" + vinClass + "/" + vinYear);
+  }
   let data = await response.json();
   return data;
 }
