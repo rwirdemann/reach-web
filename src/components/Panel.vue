@@ -2,14 +2,14 @@
   <form>
     <div class="form-group row">
       <label class="col-sm-9 col-form-label">API Version</label>
-      <select class="form-control col-sm-3" v-model="apiVersion" v-on:change="toggleMarketSelection(); loadVINs()">
+      <select class="form-control col-sm-3" v-model="apiVersion" v-on:change="toggleMarketSelection(); loadVINs(); emitVersionChange()">
         <option>v2</option>
         <option>v3</option>
       </select>
     </div>
     <div class="form-group row">
       <label class="col-sm-9 col-form-label">Market</label>
-      <select class="form-control col-sm-3" v-model="market" :disabled="isMarketSelectable != 1" v-on:change="loadVINs()">
+      <select class="form-control col-sm-3" v-model="market" :disabled="isMarketSelectable != 1" v-on:change="loadVINs(); emitMarketChange()">
         <option>v</option>
         <option>n</option>
       </select>
@@ -80,29 +80,41 @@ export default {
       let base = m[m.length - 2].trim();
       let year = m[m.length - 1].trim();
       this.$root.$emit("model_change", base, year);
+    },
+    emitVersionChange: function() {
+      this.$root.$emit("version_change", this.apiVersion);
+    },
+    emitMarketChange: function() {
+      this.$root.$emit("market_change", this.market);
     }
   }
 };
 
 async function fetchVINs(url, apiVersion, market) {
-  var response;
-  if (apiVersion === "v2") {
-    response = await fetch("https://" + url + "/api/" + apiVersion + "/models");
-  } else {
-    response = await fetch( "https://" + url + "/api/" + apiVersion + "/models/" + market);
-  }
+  let response = await fetch(vinsURL(url, apiVersion, market))
   let data = await response.json();
   return data;
 }
 
-async function fetchModels(url, apiVersion, market, vinClass, vinYear) {
-  var response;
-  if (apiVersion === "v2") {
-    response = await fetch("https://" + url + "/api/" + apiVersion + "/models/" + vinClass + "/" + vinYear);
+function vinsURL(baseURL, version, market) {
+  if (version == "v2") {
+    return `https://${baseURL}/api/${version}/models`
   } else {
-    response = await fetch( "https://" + url + "/api/" + apiVersion + "/models/" + market + "/" + vinClass + "/" + vinYear);
+    return `https://${baseURL}/api/${version}/models/${market}`
   }
+}
+
+async function fetchModels(url, apiVersion, market, vinClass, vinYear) {
+  let response = await fetch(modelsURL(url, apiVersion, market, vinClass, vinYear))
   let data = await response.json();
   return data;
+}
+
+function modelsURL(baseURL, version, market, vinClass, vinYear) {
+  if (version == "v2") {
+    return `https://${baseURL}/api/${version}/models/${vinClass}/${vinYear}`
+  } else {
+    return `https://${baseURL}/api/${version}/models/${market}/${vinClass}/${vinYear}`
+  }
 }
 </script>
