@@ -74,6 +74,7 @@ export default {
       fetchModels(this.baseURL, this.apiVersion, this.market, vinClass, vinYear).then(json => {
         this.models = json.models;
       });
+      this.$root.$emit("models_change", this.market);
     },
     loadSubstances: function() {
       let m = this.selectedModel.trim().split(" ");
@@ -82,6 +83,8 @@ export default {
       this.$root.$emit("model_change", base, year);
     },
     emitVersionChange: function() {
+      this.selectedVin = ''
+      this.selectedModel = ''
       this.$root.$emit("version_change", this.apiVersion);
     },
     emitMarketChange: function() {

@@ -1,8 +1,21 @@
 <template>
   <div>
-    <ul class="list-group">
-      <li class="list-group-item" v-for="s in substances" v-bind:key="s.NameDE">{{ s.NameDE }}</li>
-    </ul>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Part</th>
+          <th scope="col">Substance</th>
+          <th scope="col">CAS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="s in substances" v-bind:key="s.NameDE">
+          <td>{{ s.TeivonDE }}</td>
+          <td>{{ s.NameDE }}</td>
+          <td>{{ s.CAS }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -21,6 +34,9 @@ export default {
   },
   created() {},
   mounted() {
+    this.$root.$on("models_change", (base, year) => {
+      this.substances = []
+    });
     this.$root.$on("model_change", (base, year) => {
       fetchSubstances(this.baseURL, this.apiVersion, this.market, base, year).then(json => {
         this.substances = json.vehicle.reach;
@@ -28,9 +44,11 @@ export default {
     });
     this.$root.$on("version_change", (version) => {
       this.apiVersion = version
+      this.substances = []
     });
     this.$root.$on("market_change", (market) => {
       this.market = market
+      this.substances = []
     });
   }
 };
