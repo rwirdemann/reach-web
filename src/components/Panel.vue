@@ -5,6 +5,10 @@
       <input class="form-control col-sm-7" v-model="baseURL" type="text" readonly>
     </div>
     <div class="form-group row">
+      <label class="col-sm-9 col-form-label">Version</label>
+      <input class="form-control col-sm-3" v-model="version" type="text" readonly>
+    </div>
+    <div class="form-group row">
       <label class="col-sm-9 col-form-label">API Version</label>
       <select class="form-control col-sm-3" v-model="apiVersion" v-on:change="toggleMarketSelection(); loadVINs(); emitVersionChange()">
         <option>v2</option>
@@ -49,6 +53,7 @@ export default {
   },
   data() {
     return {
+      version: "",
       selectedVin: "",
       vins: [],
       selectedModel: "",
@@ -61,6 +66,9 @@ export default {
   created() {
     fetchVINs(this.baseURL, this.apiVersion, this.market).then(json => {
       this.vins = json;
+    });
+    fetchVersion(this.baseURL).then(json => {
+      this.version = json['reach api version']
     });
   },
   methods: {
@@ -99,6 +107,12 @@ export default {
     }
   }
 };
+
+async function fetchVersion(url) {
+  let response = await fetch(`https://${url}/api/about`)
+  let data = await response.json();
+  return data;
+}
 
 async function fetchVINs(url, apiVersion, market) {
   let response = await fetch(vinsURL(url, apiVersion, market))

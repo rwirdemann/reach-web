@@ -1,6 +1,16 @@
 <template>
   <div>
-    <table class="table">
+    <div v-if="!substances[0]" class="jumbotron">
+      <h1 class="display-6">REACH Vehicle Information Service</h1>
+      <p class="lead">
+        The REACH service returns a list of chemical substances plugged into a specific
+        car according to the EU decree No. 1907/2006.
+      </p>
+      <p class="lead">
+        To start select a VIN class / year combination followed by a model.
+      </p>
+    </div>
+    <table v-if="substances[0]" class="table">
       <thead>
         <tr>
           <th scope="col">Part</th>
