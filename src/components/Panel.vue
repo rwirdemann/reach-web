@@ -1,6 +1,10 @@
 <template>
   <form>
     <div class="form-group row">
+      <label class="col-sm-5 col-form-label">URL</label>
+      <input class="form-control col-sm-7" v-model="baseURL" type="text" readonly>
+    </div>
+    <div class="form-group row">
       <label class="col-sm-9 col-form-label">API Version</label>
       <select class="form-control col-sm-3" v-model="apiVersion" v-on:change="toggleMarketSelection(); loadVINs(); emitVersionChange()">
         <option>v2</option>
@@ -12,6 +16,7 @@
       <select class="form-control col-sm-3" v-model="market" :disabled="isMarketSelectable != 1" v-on:change="loadVINs(); emitMarketChange()">
         <option>v</option>
         <option>n</option>
+        <option>i</option>
       </select>
     </div>
     <div class="form-group row">
@@ -88,6 +93,8 @@ export default {
       this.$root.$emit("version_change", this.apiVersion);
     },
     emitMarketChange: function() {
+      this.selectedVin = ''
+      this.selectedModel = ''
       this.$root.$emit("market_change", this.market);
     }
   }
