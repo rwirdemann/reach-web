@@ -18,9 +18,9 @@
     <div class="form-group row">
       <label class="col-sm-9 col-form-label">Market</label>
       <select class="form-control col-sm-3" v-model="market" :disabled="isMarketSelectable != 1" v-on:change="loadVINs(); emitMarketChange()">
-        <option>v</option>
-        <option>n</option>
-        <option>i</option>
+        <option v-for="m in markets" v-bind:key="m">
+          {{ m.label }}
+        </option>
       </select>
     </div>
     <div class="form-group row">
@@ -58,6 +58,7 @@ export default {
       vins: [],
       selectedModel: "",
       models: [],
+      markets: [],
       market: "v",
       isMarketSelectable: false,
       apiVersion: "v2"
@@ -66,6 +67,9 @@ export default {
   created() {
     fetchVINs(this.baseURL, this.apiVersion, this.market).then(json => {
       this.vins = json;
+    });
+    fetchMarkets(this.baseURL).then(json => {
+      this.markets = json.markets;
     });
     fetchVersion(this.baseURL).then(json => {
       this.version = json['reach api version']
@@ -130,6 +134,12 @@ function vinsURL(baseURL, version, market) {
 
 async function fetchModels(url, apiVersion, market, vinClass, vinYear) {
   let response = await fetch(modelsURL(url, apiVersion, market, vinClass, vinYear))
+  let data = await response.json();
+  return data;
+}
+
+async function fetchMarkets(url) {
+  let response = await fetch(`https://${url}/api/v3/markets`)
   let data = await response.json();
   return data;
 }
